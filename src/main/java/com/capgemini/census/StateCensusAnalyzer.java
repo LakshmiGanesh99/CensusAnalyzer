@@ -1,21 +1,21 @@
 package com.capgemini.census;
 
-import com.capgemini.opencsvbuilder.*;
-import com.google.gson.Gson;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.StreamSupport;
+import com.capgemini.opencsvbuilder.CSVBuilderFactory;
+import com.capgemini.opencsvbuilder.CustomCSVBuilderException;
+import com.capgemini.opencsvbuilder.ICSVBuilder;
+import com.google.gson.Gson;
 import com.opencsv.bean.MappingStrategy;
 
 public class StateCensusAnalyzer {
 	
 	List<CSVStateCensus> csvStateCensusList;
+	List<CSVStates> csvStateCodeList;
 	
 	public int loadStateCensusData(String csvFilePath, MappingStrategy<CSVStateCensus> mappingStrategy, Class<? extends CSVStateCensus> csvBinderClass, final char separator) throws CustomFileIOException, CustomCSVBuilderException {
 		try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))){	
@@ -27,12 +27,11 @@ public class StateCensusAnalyzer {
 			return csvStateCensusList.size();
 		} catch (IOException e) {
 			throw new CustomFileIOException(ExceptionTypeIO.FILE_PROBLEM);
-		}
+		} 
 	}
 
 	public int loadStateCodeData(String csvFilePath, MappingStrategy<CSVStates> mappingStrategy, Class<? extends CSVStates> csvBinderClass, final char separator) throws CustomFileIOException, CustomCSVBuilderException {
 		try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))){	
-			List<CSVStates> csvStateCodeList;
 			ICSVBuilder csvBuilder = new CSVBuilderFactory().createCSVBuilder();
 			if(csvBinderClass != null)
 				csvStateCodeList = csvBuilder.getCSVFileList(reader, CSVStates.class, mappingStrategy, separator);
@@ -62,5 +61,26 @@ public class StateCensusAnalyzer {
 				}
 			}
 		}
+	}
+
+	public String getAlpahebeticalStateCodeWiseData() {
+		Comparator<CSVStates> codeComparator = Comparator.comparing(codelist -> codelist.code);
+		this.sortCodeWise(codeComparator);
+		String sortedStateCodeList = new Gson().toJson(csvStateCodeList);
+		return sortedStateCodeList;
+	}
+
+	private void sortCodeWise(Comparator<CSVStates> codeComparator) {
+		for(int i = 0; i < csvStateCodeList.size(); i++) {
+			for(int j = 0; j < csvStateCodeList.size() - i- 1; j++) {
+				CSVStates codeEntryOne = csvStateCodeList.get(j);
+				CSVStates codeEntryTwo = csvStateCodeList.get(j + 1);
+				if(codeComparator.compare(codeEntryOne, codeEntryTwo) > 0) {
+					csvStateCodeList.set(j, codeEntryTwo);
+					csvStateCodeList.set(j + 1, codeEntryOne);
+				}
+			}
+		}
+		
 	}
 }
