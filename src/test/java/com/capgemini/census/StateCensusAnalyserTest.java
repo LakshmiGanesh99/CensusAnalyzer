@@ -3,6 +3,8 @@ package com.capgemini.census;
 import com.capgemini.opencsvbuilder.*;
 import com.google.gson.Gson;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
@@ -12,7 +14,8 @@ public class StateCensusAnalyserTest {
 	private final String STATE_CENSUS_CSV_FILE = "./src/main/resources/StateCensusCSVData.csv";
 	private final String INCORRECT_STATE_CENSUS_CSV_FILE = "./src/main/resources/_StateCensusCSVData.csv";
 	private final String INCORRECT_HEADER_STATE_CENSUS_CSV_FILE = "./src/main/resources/StateCensusCSVDataIncorrectHeader.csv";
-
+	private final String JSON_FILE_PATH_TO_WRITE_SORTED_BY_POPULATION_DATA = "./src/main/resources/StateCensusDataSortedByPopulation.json";
+	
 	@Test
 	public void givenTheStatesCensusCSVFile_WhenRead_NoOfRecordsShouldMatch() throws CustomFileIOException, CustomCSVBuilderException  {
 		StateCensusAnalyzer stateCensusAnalyser = new StateCensusAnalyzer();
@@ -85,5 +88,16 @@ public class StateCensusAnalyserTest {
 		String sortedCensusData = stateCensusAnalyser.getAlpahebeticalStateWiseCensusData();
 		CSVStateCensus[] censusCSV = new Gson().fromJson(sortedCensusData, CSVStateCensus[].class);
 		Assert.assertEquals("Assam", censusCSV[0].state);
+	}
+	
+	@Test
+	public void givenCensusData_WhenSortedByPopulationDescending_ShouldGiveSortedResult() throws CustomCSVBuilderException, CustomFileIOException, IOException {
+		StateCensusAnalyzer stateCensusAnalyser = new StateCensusAnalyzer();
+		MappingStrategy<CSVStateCensus> mappingStrategy = new HeaderColumnNameMappingStrategy<CSVStateCensus>();
+		mappingStrategy.setType(CSVStateCensus.class);
+		stateCensusAnalyser.loadStateCensusData(STATE_CENSUS_CSV_FILE, mappingStrategy, CSVStateCensus.class, ',');
+		String sortedCensusData = stateCensusAnalyser.getPopulationWiseCensusDataAndWriteToJsonFile(JSON_FILE_PATH_TO_WRITE_SORTED_BY_POPULATION_DATA);
+		CSVStateCensus[] censusCSV = new Gson().fromJson(sortedCensusData, CSVStateCensus[].class);
+		Assert.assertEquals("Uttar Pradesh", censusCSV[0].state);
 	}
 }
