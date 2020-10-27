@@ -6,9 +6,9 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.MappingStrategy;
 
-public class OpenCSVBuilder {
-	public <E> Iterator<E> getCSVFileIterator(Reader reader, Class<E> csvBinderClass,
-			MappingStrategy<E> mappingStrategy, final char separator) {
+public class OpenCSVBuilder<E> implements ICSVBuilder {
+	public Iterator<E> getCSVFileIterator(Reader reader, Class csvBinderClass,
+			MappingStrategy mappingStrategy, final char separator) {
 		CsvToBeanBuilder<E> csvToBeanBuilder = new CsvToBeanBuilder<>(reader);
 		csvToBeanBuilder.withMappingStrategy(mappingStrategy);
 		csvToBeanBuilder.withType(csvBinderClass);
