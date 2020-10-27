@@ -6,7 +6,7 @@ import org.junit.Test;
 public class StateCensusAnalyserTest {
 	private final String STATE_CENSUS_CSV_FILE = "./src/main/resources/StateCensusCSVData.csv";
 	private final String INCORRECT_STATE_CENSUS_CSV_FILE = "./src/main/resources/_StateCensusCSVData.csv";
-
+ 
 	@Test
 	public void givenTheStatesCensusCSVFile_WhenRead_NoOfRecordsShouldMatch() throws StateCensusException {
 		StateCensusAnalyzer stateCensusAnalyser = new StateCensusAnalyzer();
