@@ -1,47 +1,66 @@
 package com.capgemini.census;
 
 import com.capgemini.opencsvbuilder.*;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.StreamSupport;
 import com.opencsv.bean.MappingStrategy;
 
 public class StateCensusAnalyzer {
+	
+	List<CSVStateCensus> csvStateCensusList;
+	
 	public int loadStateCensusData(String csvFilePath, MappingStrategy<CSVStateCensus> mappingStrategy, Class<? extends CSVStateCensus> csvBinderClass, final char separator) throws CustomFileIOException, CustomCSVBuilderException {
 		try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))){	
-			Iterator<CSVStateCensus> csvStateCensusIterator;
 			ICSVBuilder csvBuilder = new CSVBuilderFactory().createCSVBuilder();
 			if(csvBinderClass != null)
-				csvStateCensusIterator = csvBuilder.getCSVFileIterator(reader, CSVStateCensus.class, mappingStrategy, separator);
+				csvStateCensusList = csvBuilder.getCSVFileList(reader, CSVStateCensus.class, mappingStrategy, separator);
 			else
-				csvStateCensusIterator = csvBuilder.getCSVFileIterator(reader, null, null, separator);
-			return getCount(csvStateCensusIterator);
+				csvStateCensusList = csvBuilder.getCSVFileList(reader, null, null, separator);
+			return csvStateCensusList.size();
+		} catch (IOException e) {
+			throw new CustomFileIOException(ExceptionTypeIO.FILE_PROBLEM);
+		}
+	}
+
+	public int loadStateCodeData(String csvFilePath, MappingStrategy<CSVStates> mappingStrategy, Class<? extends CSVStates> csvBinderClass, final char separator) throws CustomFileIOException, CustomCSVBuilderException {
+		try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))){	
+			List<CSVStates> csvStateCodeList;
+			ICSVBuilder csvBuilder = new CSVBuilderFactory().createCSVBuilder();
+			if(csvBinderClass != null)
+				csvStateCodeList = csvBuilder.getCSVFileList(reader, CSVStates.class, mappingStrategy, separator);
+			else
+				csvStateCodeList= csvBuilder.getCSVFileList(reader, null, null, separator);
+			return csvStateCodeList.size();
 		} catch (IOException e) {
 			throw new CustomFileIOException(ExceptionTypeIO.FILE_PROBLEM);
 		} 
 	}
 
-	public int loadStateCodeData(String csvFilePath, MappingStrategy<CSVStates> mappingStrategy, Class<? extends CSVStates> csvBinderClass, final char separator) throws CustomFileIOException, CustomCSVBuilderException {
-		try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))){	
-			Iterator<CSVStates> csvStateCodeIterator;
-			ICSVBuilder csvBuilder = new CSVBuilderFactory().createCSVBuilder();
-			if(csvBinderClass != null)
-				csvStateCodeIterator = csvBuilder.getCSVFileIterator(reader, CSVStates.class, mappingStrategy, separator);
-			else
-				csvStateCodeIterator = csvBuilder.getCSVFileIterator(reader, null, null, separator);
-			return getCount(csvStateCodeIterator);
-		} catch (IOException e) {
-			throw new CustomFileIOException(ExceptionTypeIO.FILE_PROBLEM);
-		} 
-	}
-	
-	private <E> int getCount(Iterator<E> iterator) {
-		Iterable<E> csvIterable = () -> iterator;
-		int numOfEntries = (int) StreamSupport.stream(csvIterable.spliterator(), false).count();
-		return numOfEntries;
+	public String getAlpahebeticalStateWiseCensusData(){	
+			Comparator<CSVStateCensus> censusComparator = Comparator.comparing(census -> census.state);
+			this.sort(censusComparator);
+			String sortedStateCensus = new Gson().toJson(csvStateCensusList);
+			return sortedStateCensus;
+		}  
+
+	private void sort(Comparator<CSVStateCensus> censusComparator) {
+		for(int i = 0; i < csvStateCensusList.size(); i++) {
+			for(int j = 0; j < csvStateCensusList.size() - i- 1; j++) {
+				CSVStateCensus censusOne = csvStateCensusList.get(j);
+				CSVStateCensus censusTwo = csvStateCensusList.get(j + 1);
+				if(censusComparator.compare(censusOne, censusTwo) > 0) {
+					csvStateCensusList.set(j, censusTwo);
+					csvStateCensusList.set(j + 1, censusOne);
+				}
+			}
+		}
 	}
 }

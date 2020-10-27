@@ -1,10 +1,10 @@
 package com.capgemini.census;
 
 import com.capgemini.opencsvbuilder.*;
+import com.google.gson.Gson;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.MappingStrategy;
 
@@ -74,5 +74,16 @@ public class StateCensusAnalyserTest {
 			exceptionMessage = e.getMessage();
 		}
 		Assert.assertEquals(ExceptionType.HEADER_OR_DELIMITER_PROBLEM.toString(), exceptionMessage);
+	}
+	
+	@Test
+	public void givenCensusData_WhenSortedAlphabetically_ShouldGiveSortedResult() throws CustomCSVBuilderException, CustomFileIOException {
+		StateCensusAnalyzer stateCensusAnalyser = new StateCensusAnalyzer();
+		MappingStrategy<CSVStateCensus> mappingStrategy = new HeaderColumnNameMappingStrategy<CSVStateCensus>();
+		mappingStrategy.setType(CSVStateCensus.class);
+		stateCensusAnalyser.loadStateCensusData(STATE_CENSUS_CSV_FILE, mappingStrategy, CSVStateCensus.class, ',');
+		String sortedCensusData = stateCensusAnalyser.getAlpahebeticalStateWiseCensusData();
+		CSVStateCensus[] censusCSV = new Gson().fromJson(sortedCensusData, CSVStateCensus[].class);
+		Assert.assertEquals("Assam", censusCSV[0].state);
 	}
 }
