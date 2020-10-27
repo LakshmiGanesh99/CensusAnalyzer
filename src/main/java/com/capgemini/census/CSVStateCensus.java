@@ -1,5 +1,5 @@
 package com.capgemini.census;
-import com.opencsv.bean.CsvBindByName; 
+import com.opencsv.bean.CsvBindByName;  
 
 public class CSVStateCensus {
 	@CsvBindByName(column = "State", required = true)

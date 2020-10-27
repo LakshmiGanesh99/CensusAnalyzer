@@ -1,7 +1,7 @@
 package com.capgemini.census;
 
 public class StateCensusException extends Exception {
-	StateCensusExceptionType exceptionType; 
+	StateCensusExceptionType exceptionType;  
 
 	public StateCensusException(String message, StateCensusExceptionType exceptionType) {
 		super(message);
