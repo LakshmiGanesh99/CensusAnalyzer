@@ -1,14 +1,12 @@
 package com.capgemini.census;
 
+enum ExceptionType{
+	STATE_CENSUS_FILE_PROBLEM, STATE_CENSUS_PARSE_PROBLEM, STATE_CENSUS_HEADER_OR_DELIMITER_PROBLEM
+}
+
+@SuppressWarnings("serial")
 public class StateCensusException extends Exception {
-	StateCensusExceptionType exceptionType;  
-
-	public StateCensusException(String message, StateCensusExceptionType exceptionType) {
-		super(message);
-		this.exceptionType = exceptionType;
+	public StateCensusException(ExceptionType exceptionType) {
+		super(exceptionType.toString());
 	}
-} 
-
-enum StateCensusExceptionType {
-	CENSUS_FILE_PROBLEM, INCORRECT_TYPE, SOME_OTHER_ERRORS
 }
