@@ -1,4 +1,4 @@
-package com.capgemini.census;
+ package com.capgemini.census;
 
 import org.junit.Assert;
 import org.junit.Test;
