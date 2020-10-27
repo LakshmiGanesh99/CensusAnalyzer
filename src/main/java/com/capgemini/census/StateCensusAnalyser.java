@@ -15,7 +15,7 @@ import com.opencsv.bean.MappingStrategy;
 
 public class StateCensusAnalyser {
 
-	List<CSVStateCensus> csvStateCensusList;
+	List<CSVStateCensus> csvStateCensusList; 
 	List<CSVStates> csvStateCodeList;
 
 	public int loadStateCensusData(String csvFilePath, MappingStrategy<CSVStateCensus> mappingStrategy, Class<? extends CSVStateCensus> csvBinderClass, final char separator) throws CustomFileIOException, CustomCSVBuilderException {

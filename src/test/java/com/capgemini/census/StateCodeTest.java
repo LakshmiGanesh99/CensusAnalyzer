@@ -3,7 +3,7 @@ package com.capgemini.census;
 
 import com.capgemini.opencsvbuilder.*;
 import com.google.gson.Gson;
-
+ 
 import org.junit.Assert;
 import org.junit.Test;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
