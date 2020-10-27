@@ -21,7 +21,7 @@ public class StateCensusAnalyzer {
 			Iterator<CSVStateCensus> censusCsvIterator = csvToBean.iterator();
 			Iterable<CSVStateCensus> csvIterable = () -> censusCsvIterator;
 			int numOfEntries = (int) StreamSupport.stream(csvIterable.spliterator(), false).count();
-			return numOfEntries;
+			return numOfEntries; 
 		}
 		catch (IOException e) {
 			throw new StateCensusException("Incorrect CSV File", StateCensusExceptionType.CENSUS_FILE_PROBLEM);
