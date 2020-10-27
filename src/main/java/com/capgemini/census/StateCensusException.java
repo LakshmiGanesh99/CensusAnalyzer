@@ -7,7 +7,7 @@ public class StateCensusException extends Exception {
 		super(message);
 		this.exceptionType = exceptionType;
 	}
-}
+} 
 
 enum StateCensusExceptionType {
 	CENSUS_FILE_PROBLEM, INCORRECT_TYPE, SOME_OTHER_ERRORS
