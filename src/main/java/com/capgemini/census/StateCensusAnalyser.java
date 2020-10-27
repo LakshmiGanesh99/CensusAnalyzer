@@ -7,14 +7,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
+import com.capgemini.opencsvbuilder.CSVBuilderFactory;
+import com.capgemini.opencsvbuilder.CustomCSVBuilderException;
+import com.capgemini.opencsvbuilder.ICSVBuilder;
 import com.google.gson.Gson;
 import com.opencsv.bean.MappingStrategy;
 
-public class StateCensusAnalyzer {
-	
+public class StateCensusAnalyser {
+
 	List<CSVStateCensus> csvStateCensusList;
 	List<CSVStates> csvStateCodeList;
-	
+
 	public int loadStateCensusData(String csvFilePath, MappingStrategy<CSVStateCensus> mappingStrategy, Class<? extends CSVStateCensus> csvBinderClass, final char separator) throws CustomFileIOException, CustomCSVBuilderException {
 		try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))){	
 			ICSVBuilder csvBuilder = new CSVBuilderFactory().createCSVBuilder();
@@ -42,11 +45,11 @@ public class StateCensusAnalyzer {
 	}
 
 	public String getAlpahebeticalStateWiseCensusData(){	
-			Comparator<CSVStateCensus> censusComparator = Comparator.comparing(census -> census.state);
-			this.sort(censusComparator);
-			String sortedStateCensus = new Gson().toJson(csvStateCensusList);
-			return sortedStateCensus;
-		}  
+		Comparator<CSVStateCensus> censusComparator = Comparator.comparing(census -> census.state);
+		this.sort(censusComparator);
+		String sortedStateCensus = new Gson().toJson(csvStateCensusList);
+		return sortedStateCensus;
+	}  
 
 	private void sort(Comparator<CSVStateCensus> censusComparator) {
 		for(int i = 0; i < csvStateCensusList.size(); i++) {
@@ -60,7 +63,7 @@ public class StateCensusAnalyzer {
 			}
 		}
 	}
-	
+
 	private void sortDescending(Comparator<CSVStateCensus> censusComparator) {
 		for(int i = 0; i < csvStateCensusList.size(); i++) {
 			for(int j = 0; j < csvStateCensusList.size() - i- 1; j++) {
@@ -92,12 +95,33 @@ public class StateCensusAnalyzer {
 				}
 			}
 		}
-		
+
 	}
 
 	public String getPopulationWiseCensusDataAndWriteToJsonFile(String jsonFilePath) throws IOException {
 		FileWriter fileWriter = new FileWriter(jsonFilePath);
 		Comparator<CSVStateCensus> censusComparator = Comparator.comparing(census -> census.population);
+		this.sortDescending(censusComparator);
+		String sortedStateCensus = new Gson().toJson(csvStateCensusList);
+		fileWriter.write(sortedStateCensus);
+		fileWriter.close();
+		return sortedStateCensus;
+	}
+
+	public String getPopulationDensityWiseCensusDataAndWriteToJsonFile(
+			String jsonFilePath) throws IOException {
+		FileWriter fileWriter = new FileWriter(jsonFilePath);
+		Comparator<CSVStateCensus> censusComparator = Comparator.comparing(census -> census.densityPerSqKm);
+		this.sortDescending(censusComparator);
+		String sortedStateCensus = new Gson().toJson(csvStateCensusList);
+		fileWriter.write(sortedStateCensus);
+		fileWriter.close();
+		return sortedStateCensus;
+	}
+
+	public String getAreaWiseCensusDataAndWriteToJsonFile(String jsonFilePath) throws IOException {
+		FileWriter fileWriter = new FileWriter(jsonFilePath);
+		Comparator<CSVStateCensus> censusComparator = Comparator.comparing(census -> census.areaInSqKm);
 		this.sortDescending(censusComparator);
 		String sortedStateCensus = new Gson().toJson(csvStateCensusList);
 		fileWriter.write(sortedStateCensus);
