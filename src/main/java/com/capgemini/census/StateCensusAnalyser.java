@@ -1,5 +1,4 @@
 package com.capgemini.census;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
@@ -7,10 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
+import com.capgemini.opencsvbuilder.CSVBuilderFactory;
+import com.capgemini.opencsvbuilder.CustomCSVBuilderException;
+import com.capgemini.opencsvbuilder.ICSVBuilder;
 import com.google.gson.Gson;
 import com.opencsv.bean.MappingStrategy;
 
-public class StateCensusAnalyzer {
+public class StateCensusAnalyser {
 	
 	List<CSVStateCensus> csvStateCensusList;
 	List<CSVStates> csvStateCodeList;
@@ -98,6 +100,17 @@ public class StateCensusAnalyzer {
 	public String getPopulationWiseCensusDataAndWriteToJsonFile(String jsonFilePath) throws IOException {
 		FileWriter fileWriter = new FileWriter(jsonFilePath);
 		Comparator<CSVStateCensus> censusComparator = Comparator.comparing(census -> census.population);
+		this.sortDescending(censusComparator);
+		String sortedStateCensus = new Gson().toJson(csvStateCensusList);
+		fileWriter.write(sortedStateCensus);
+		fileWriter.close();
+		return sortedStateCensus;
+	}
+
+	public String getPopulationDensityWiseCensusDataAndWriteToJsonFile(
+			String jsonFilePath) throws IOException {
+		FileWriter fileWriter = new FileWriter(jsonFilePath);
+		Comparator<CSVStateCensus> censusComparator = Comparator.comparing(census -> census.densityPerSqKm);
 		this.sortDescending(censusComparator);
 		String sortedStateCensus = new Gson().toJson(csvStateCensusList);
 		fileWriter.write(sortedStateCensus);
